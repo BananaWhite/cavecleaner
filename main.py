@@ -1,3 +1,4 @@
+import os
 import discord
 import re
 import logging
@@ -18,6 +19,8 @@ URL_RE = re.compile(
 USR_ID = re.compile(r"<@!?(\d+)>", re.IGNORECASE)
 
 bot = commands.Bot(command_prefix="!", intents=intents)
+
+BOT_TOKEN = os.environ.get("DISCORD_BOT_KEY")
 
 def logger() -> Logger:
     _logger = logging.getLogger(__file__)
@@ -75,4 +78,4 @@ async def on_voice_state_update(member: discord.Member, before: discord.VoiceSta
         await chat_channel.send("<:mokerer:1429886210595098684>")
 
 if __name__ == "__main__":
-    bot.run("")
+    bot.run(BOT_TOKEN)
