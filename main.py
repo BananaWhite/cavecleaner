@@ -1,3 +1,4 @@
+import os
 import discord
 import re
 import logging
@@ -9,8 +10,9 @@ intents.message_content = True
 intents.messages = True
 intents.guilds = True
 
-CHANNEL_TO_SCAN_CONTAINING_LINKS=1428314569364733984
-CHANNEL_TO_SEND_LINKS_TO=1428318025634942977
+CHANNEL_TO_SCAN_CONTAINING_LINKS= os.environ.get("CHAT_CHANNEL")
+CHANNEL_TO_SEND_LINKS_TO = os.environ.get("MEDIA_CHANNEL")
+MOCARR_ID = os.environ.get("MOCARR_ID")
 
 URL_RE = re.compile(
     r'(?P<url>(?:https?://|ftp://|www\.)[^\s<>"]+)', re.IGNORECASE
@@ -18,6 +20,8 @@ URL_RE = re.compile(
 USR_ID = re.compile(r"<@!?(\d+)>", re.IGNORECASE)
 
 bot = commands.Bot(command_prefix="!", intents=intents)
+
+BOT_TOKEN = os.environ.get("DISCORD_BOT_KEY")
 
 def logger() -> Logger:
     _logger = logging.getLogger(__file__)
@@ -51,7 +55,7 @@ async def process_message(message: discord.Message):
         # await target_channel.send()
         await message.delete()
         await original_channel.send(content=f"<@{message.author.id}>, you reposted in the wrong neighborhood", silent=True)
-        if message.author.id == 307858012721119233:
+        if message.author.id == MOCARR_ID:
             await original_channel.send(content=f"<@{message.author.id}>, A kto to przyszedł? Pan maruda niszczyciel dobrej zabawy pogromca uśmiechów dzieci.")
 
 @bot.event
@@ -69,10 +73,10 @@ async def on_message_edit(before: discord.Message, after: discord.Message):
 @bot.event
 async def on_voice_state_update(member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
     chat_channel = bot.get_channel(CHANNEL_TO_SCAN_CONTAINING_LINKS)
-    if member.id == 307858012721119233 and before.channel is None and after.channel is not None:
+    if member.id == MOCARR_ID and before.channel is None and after.channel is not None:
         await chat_channel.send(
             content=f"<@{member.id}>, A kto to przyszedł? Pan maruda niszczyciel dobrej zabawy pogromca uśmiechów dzieci.")
         await chat_channel.send("<:mokerer:1429886210595098684>")
 
 if __name__ == "__main__":
-    bot.run("")
+    bot.run(BOT_TOKEN)
